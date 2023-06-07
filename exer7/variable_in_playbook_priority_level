@@ -1,0 +1,1 @@
+playbook __ host_vars/hostname __ group_vars/groupname __ group_vars/all

@@ -1,0 +1,9 @@
+---
+# vars file for post-install
+valueha: hamza
+valuehr: haris
+valuezo: zoya
+
+path_centos: /home/centos/hamza_file
+path_ubuntu: /home/ubuntu/hamza_file
+

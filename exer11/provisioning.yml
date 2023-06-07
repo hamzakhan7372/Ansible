@@ -1,0 +1,117 @@
+---
+
+- name: Provisioning Server
+  hosts: all
+  become: yes
+
+  vars:
+    path_centos: /home/centos/hamza_file
+    path_ubuntu: /home/ubuntu/hamza_file
+
+  tasks:
+    - name: Install ntp on Centos machines
+      yum:
+        name: "{{item}}"
+        state: present
+      when: ansible_distribution == "CentOS"
+      loop:
+        - ntp
+        - wget
+        - git
+        - zip
+        - unzip
+
+    - name:  Install ntp on ubuntu machine
+      apt:
+        name: systemd-timesyncd
+        state: present
+      when: ansible_distribution == "Ubuntu"
+      loop:
+        - systemd-timesyncd
+        - wget
+        - git 
+        - zip
+        - unzip
+  
+    - name: Start & Enable NTP on RedHat
+      service:
+        name: ntpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Start & Enable NTP on Debian
+      service:
+        name: systemd-timesyncd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    - name: adding groups
+      group:
+        name: "{{item}}"
+        state: present 
+      loop:
+          - hamza-g1
+          - hamza-g2
+
+    - name: addng user
+      user:
+        name: "{{item}}"
+        comment: "full name is still unknown"
+      loop:
+          - hamza-u1
+          - hamza-u2
+
+    - name: Adding banner file /etc/motd
+      copy:
+          content: "this {{ansible_distribution}} is managed by ansible \n"
+          dest: /etc/motd
+
+#########Copying files
+
+    - name: Copy files to RedHat host machines
+      template:
+        src: ./templates/hamza-ansible-file.j2
+        dest: "{{path_centos}}"
+      when: ansible_os_family == "RedHat"
+      notify:
+        - Restart RedHat ntp server
+
+    - name: Copy files debian host machines
+      template:
+        src: ./templates/hamza-ansible-file.j2
+        dest: "{{path_ubuntu}}"
+      when: ansible_os_family == "Debian"
+      notify:
+        - Restart Debian ntp server
+
+    - name: Dir for dev data
+      file:
+        path: /opt/devdata
+        state: directory
+        mode: 0775
+      tags:
+        - system
+
+    - name: Deploy Dev data file
+      copy: 
+        src: files/dev.txt
+        dest: /opt/devdata/dev.txt
+
+  handlers:
+    - name: Restart RedHat ntp server
+      service:
+        name: ntpd
+        state: restarted
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Restart Debian ntp server
+      service:
+        name: systemd-timesyncd
+        state: restarted
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+
