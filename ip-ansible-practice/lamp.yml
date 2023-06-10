@@ -1,0 +1,67 @@
+---
+
+- name: seting up lamp server on my ubuntu machine
+  become: yes
+  hosts: web03
+  vars:
+    key1: 
+  tasks:
+    - name: Updating and Upgrading my machine
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Installing apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Installing MySQL
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Installing PHP and its depandencies
+      apt:
+        name: "{{item}}"
+        state: present
+      loop:
+        - php
+        - libapache2-mod-php
+        - php-mysql
+
+    - name: Installing required packaged for unarchiving
+      apt:
+        name: "{{item}}"
+        state: present
+      loop:
+        - unzip
+        - zip
+        - tar
+        - xz-utils
+        - gzip
+        - bzip2
+
+    - name: downloading website to deploy
+      get_url:
+        url: https://www.tooplate.com/zip-templates/2134_gotto_job.zip
+        dest: ~/
+
+    - name: unarchiving the url fie
+      unarchive:
+        remote_src: yes
+        src: ~/2134_gotto_job.zip
+        dest: ~/
+
+    - name: copy the unarchived file into html dira
+      copy:
+        remote_src: yes
+        src: ~/2134_gotto_job/
+        dest: /var/www/html/
+
+
+    - name: Starting and Enabling the apache2 service
+      service:
+        name: apache2
+        state: restarted
+        enabled: yes

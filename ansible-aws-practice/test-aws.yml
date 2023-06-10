@@ -1,0 +1,32 @@
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: Create key_pair
+      amazon.aws.ec2_key:
+        name: sample_key
+        region: us-east-1
+      register: keyout
+
+    - name: print keyout
+      debug:
+        var: keyout
+
+    - name: save key
+      copy:
+        content: "{{keyout.key.private_key}}"
+        dest: ./sample.pem
+      when: keyout.changed
+
+    - name: creating ec2 machin
+      amazon.aws.ec2_instance:
+        key_name: sample_key
+        instance_type: t2.micro
+        image_id: ami-04a0ae173da5807d3
+        wait: yes
+        region: us-east-1
+        exact_count: 1
+        tags:
+          Name: db01
+          db: postgress
+
+
