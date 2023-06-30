@@ -1,0 +1,11 @@
+- name: restarting and enabling it apache2
+  service:
+    name: apache2
+    state: restarted
+    enabled: yes
+      
+- name: restarting and enabling it httpd
+  service:
+    name: httpd
+    state: restarted
+    enabled: yes

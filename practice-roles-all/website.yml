@@ -1,0 +1,6 @@
+---
+- name: Setting up webiste on apache2
+  hosts: all
+  become: yes
+  roles:
+    - role: website

@@ -1,3 +1,0 @@
-#Varivle accessible by ALL the host in the inventory file
-username: globaluser
-usercomment: value from group_vars/all file

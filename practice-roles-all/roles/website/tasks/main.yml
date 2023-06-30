@@ -1,0 +1,39 @@
+- name: installing httpd
+  yum:
+    name: httpd
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+
+- name: installing apache2
+  apt:
+    name: apache2
+    state: present
+  when: 
+    - ansible_os_family == "Debian"
+
+- name: working on redhat
+  template:
+    src: roles/website/templates/index.html.j2
+    dest: /var/www/html/index.html
+  vars:
+    value_os: CentOS-Machines-1
+  notify:
+    - restarting and enabling it httpd
+  when: 
+    - ansible_os_family == "RedHat"
+
+- name: working on ubuntu
+  template:
+    src: roles/website/templates/index.html.j2
+    dest: /var/www/html/index.html
+  vars:
+    value_os: Ubuntu-Machines-1
+  notify:
+    - restarting and enabling it apache2
+  when: 
+    - ansible_os_family == "Debian"
+
+- copy:
+    src: roles/website/files/
+    dest: /var/www/html/

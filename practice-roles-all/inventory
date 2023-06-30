@@ -1,0 +1,14 @@
+web01 ansible_host=172.31.93.25
+web03 ansible_host=172.31.23.7 ansible_user=ubuntu
+
+[webservergrp]
+web01
+web03
+
+
+[grp_grp:children]
+webservergrp
+
+[grp_grp:vars]
+ansible_user=centos 
+ansible_ssh_private_key_file=vprofile-key.pem

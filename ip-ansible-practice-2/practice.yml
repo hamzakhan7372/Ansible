@@ -1,0 +1,26 @@
+--- 
+- name: practice apache2
+  become: yes
+  hosts: all
+  vars:
+    port_apache2: 9212
+  tasks:
+    - name: Installing httpd
+      apt:
+        name: apache2
+        state: present
+
+
+    - name: Changing port
+      template:
+        src: ./template/ports.conf.j2
+        dest: /etc/apache2/ports.conf
+      notify: 
+        - restarting and enabling it
+
+  handlers:
+    - name: restarting and enabling it
+      service:
+        name: apache2
+        state: restarted
+        enabled: yes
